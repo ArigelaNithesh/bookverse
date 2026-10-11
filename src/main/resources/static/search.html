@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal Book Search & Discovery — BOOKVERSE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .search-hero {
+      background: linear-gradient(135deg, #2c3e50 0%, #1e293b 100%);
+      color: #fff;
+      padding: 3rem 0 2rem;
+      border-radius: var(--bv-radius);
+      margin-bottom: 2rem;
+    }
+    .query-chip {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      padding: 5px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .query-chip:hover {
+      background: var(--bv-primary);
+      border-color: var(--bv-primary);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .tab-pill {
+      cursor: pointer;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border: 1px solid var(--bv-border);
+      background: #fff;
+      transition: all 0.2s ease;
+    }
+    .tab-pill.active {
+      background: var(--bv-primary);
+      color: #fff;
+      border-color: var(--bv-primary);
+      box-shadow: 0 2px 8px rgba(139, 58, 43, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg bv-navbar sticky-top">
+    <div class="container">
+      <a class="bv-brand" href="/index.html"><i class="bi bi-book-half fs-3"></i><span>BOOKVERSE</span></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navContent">
+        <ul class="navbar-nav me-auto ms-3">
+          <li class="nav-item"><a class="nav-link bv-nav-link" href="/books.html"><i class="bi bi-grid me-1"></i>Store Catalog</a></li>
+          <li class="nav-item"><a class="nav-link bv-nav-link active" href="/search.html"><i class="bi bi-globe me-1"></i>Universal Discovery</a></li>
+          <li class="nav-item"><a class="nav-link bv-nav-link" href="/categories.html">Categories</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <a href="/cart.html" class="btn btn-sm btn-bv-outline position-relative px-2 py-1">
+            <i class="bi bi-cart3 fs-6"></i>
+            <span id="cart-counter-badge" class="nav-badge" style="display:none;">0</span>
+          </a>
+          <a href="/wishlist.html" class="btn btn-sm btn-bv-outline position-relative px-2 py-1">
+            <i class="bi bi-heart fs-6"></i>
+            <span id="wishlist-counter-badge" class="nav-badge" style="display:none;">0</span>
+          </a>
+          <div id="nav-user-slot" class="d-flex align-items-center gap-2"></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <!-- SEARCH HERO -->
+    <div class="search-hero px-4 shadow-sm text-center">
+      <h2 class="fw-bold mb-2 brand-font">Universal Book Discovery</h2>
+      <p class="text-white-50 mb-4" style="max-width: 680px; margin: 0 auto;">
+        Search books of all genres from around the world — Novels, Philosophy, Psychology, Self-Help, Classic Literature, History, Science, and Programming. Powered by Open Library.
+      </p>
+
+      <!-- Main Search Box -->
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <form id="search-form" onsubmit="handleSearchSubmit(event)" class="search-autocomplete-wrap">
+            <div class="input-group input-group-lg shadow">
+              <input type="text" id="search-query" class="form-control" placeholder="Search by title, author, ISBN, subject, or keyword..." autocomplete="off">
+              <button class="btn btn-bv-primary px-4" type="submit"><i class="bi bi-search me-1"></i>Search</button>
+            </div>
+            <div id="autocomplete-box" class="search-autocomplete-dropdown text-start"></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Query Suggestions Chips -->
+      <div class="mt-3 d-flex flex-wrap justify-content-center gap-2">
+        <span class="text-white-50 small align-self-center me-1">Try:</span>
+        <button class="query-chip btn" onclick="quickSearch('The Almanack of Naval Ravikant')"><i class="bi bi-lightning-charge"></i>Naval Ravikant</button>
+        <button class="query-chip btn" onclick="quickSearch('The Metamorphosis')"><i class="bi bi-book"></i>The Metamorphosis</button>
+        <button class="query-chip btn" onclick="quickSearch('Franz Kafka')"><i class="bi bi-pen"></i>Franz Kafka</button>
+        <button class="query-chip btn" onclick="quickSearch('Meditations')"><i class="bi bi-compass"></i>Meditations (Stoicism)</button>
+        <button class="query-chip btn" onclick="quickSearch('Java Programming')"><i class="bi bi-code-slash"></i>Java Programming</button>
+        <button class="query-chip btn" onclick="quickSearch('Python')"><i class="bi bi-terminal"></i>Python</button>
+      </div>
+
+      <!-- Advanced Filters Toggle -->
+      <div class="mt-3">
+        <button class="btn btn-sm btn-link text-white-50 text-decoration-none" type="button" data-bs-toggle="collapse" data-bs-target="#advancedSearchCollapse">
+          <i class="bi bi-sliders me-1"></i>Advanced Filters (Specific Author, Title, ISBN, Subject)
+        </button>
+      </div>
+    </div>
+
+    <!-- Advanced Search Collapse Panel -->
+    <div class="collapse mb-4" id="advancedSearchCollapse">
+      <div class="card card-body bg-white border-0 shadow-sm">
+        <h6 class="fw-bold mb-3"><i class="bi bi-funnel me-1 text-primary"></i>Targeted Field Search</h6>
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label small text-muted">Specific Title</label>
+            <input type="text" id="adv-title" class="form-control form-control-sm" placeholder="e.g. The Metamorphosis">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small text-muted">Author Name</label>
+            <input type="text" id="adv-author" class="form-control form-control-sm" placeholder="e.g. Franz Kafka">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small text-muted">ISBN (10 or 13)</label>
+            <input type="text" id="adv-isbn" class="form-control form-control-sm" placeholder="e.g. 9780143105244">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small text-muted">Subject / Genre</label>
+            <input type="text" id="adv-subject" class="form-control form-control-sm" placeholder="e.g. Philosophy, Fiction">
+          </div>
+        </div>
+        <div class="mt-3 text-end">
+          <button class="btn btn-sm btn-outline-secondary me-2" onclick="clearAdvFilters()">Reset</button>
+          <button class="btn btn-sm btn-bv-primary px-3" onclick="executeSearch(1)">Apply Targeted Search</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER TABS & STATUS BAR -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <button class="tab-pill active" id="tab-all" onclick="setTab('all')">
+          <i class="bi bi-collection me-1"></i>All Results <span id="count-all" class="badge bg-secondary ms-1">0</span>
+        </button>
+        <button class="tab-pill" id="tab-store" onclick="setTab('store')">
+          <i class="bi bi-bag-check me-1"></i>Available in Store <span id="count-store" class="badge bg-success ms-1">0</span>
+        </button>
+        <button class="tab-pill" id="tab-discovery" onclick="setTab('discovery')">
+          <i class="bi bi-globe me-1"></i>Global Discovery <span id="count-discovery" class="badge bg-primary ms-1">0</span>
+        </button>
+      </div>
+
+      <div id="search-status-text" class="text-muted small"></div>
+    </div>
+
+    <!-- SECTION 1: IN-STORE RESULTS (Immediate Purchase) -->
+    <div id="store-section" class="mb-5" style="display:none;">
+      <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+        <h5 class="fw-bold mb-0 text-success"><i class="bi bi-check-circle-fill me-2"></i>Available for Immediate Purchase in Store</h5>
+        <span class="badge bg-success-subtle text-success border border-success-subtle">Ready to Ship</span>
+      </div>
+      <div id="store-grid" class="row g-4"></div>
+    </div>
+
+    <!-- SECTION 2: DISCOVERED RESULTS (Open Library) -->
+    <div id="discovery-section">
+      <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+        <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-compass me-2"></i>Global Book Discovery (Open Library Catalog)</h5>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle">World Catalog</span>
+      </div>
+      <div id="discovery-grid" class="row g-4">
+        <div class="col-12 loading-spinner-wrapper">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">Searching global book library...</p>
+        </div>
+      </div>
+
+      <!-- PAGINATION CONTROLS -->
+      <div class="d-flex justify-content-center align-items-center gap-3 mt-4" id="pagination-controls" style="display:none;">
+        <button class="btn btn-sm btn-outline-secondary" id="btn-prev-page" onclick="changePage(-1)" disabled>
+          <i class="bi bi-arrow-left me-1"></i>Previous Page
+        </button>
+        <span class="small text-muted fw-semibold" id="page-display">Page 1</span>
+        <button class="btn btn-sm btn-outline-secondary" id="btn-next-page" onclick="changePage(1)">
+          Next Page<i class="bi bi-arrow-right ms-1"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL: WORK DISCOVERY DETAILS -->
+  <div class="modal fade" id="workDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="workModalTitle">Book Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-4" id="workModalBody">
+          <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMINISTRATOR IMPORT BOOK -->
+  <div class="modal fade" id="adminImportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-light">
+          <h5 class="modal-title fw-bold"><i class="bi bi-cloud-arrow-down me-2 text-primary"></i>Import Book to BOOKVERSE Store</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="adminImportForm" onsubmit="submitAdminImport(event)">
+          <div class="modal-body">
+            <input type="hidden" id="import-work-key">
+            <input type="hidden" id="import-cover-url">
+
+            <div class="row g-3">
+              <div class="col-md-3 text-center">
+                <img id="import-preview-img" src="" alt="Cover" class="img-fluid rounded shadow-sm mb-2" style="max-height: 220px;">
+                <div class="small text-muted" id="import-isbn-display"></div>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Book Title *</label>
+                  <input type="text" id="import-title" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label small fw-bold">Author(s) *</label>
+                  <input type="text" id="import-authors" class="form-control" placeholder="Comma separated author names" required>
+                </div>
+                <div class="row g-2 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Publisher</label>
+                    <input type="text" id="import-publisher" class="form-control" placeholder="Publisher name">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Category / Genre</label>
+                    <input type="text" id="import-category" class="form-control" placeholder="e.g. Philosophy, Self-Help, Fiction">
+                  </div>
+                </div>
+                <div class="row g-2 mb-3">
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Publication Year</label>
+                    <input type="number" id="import-year" class="form-control" value="2022">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label small fw-bold">Page Count</label>
+                    <input type="number" id="import-pages" class="form-control" value="250">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr>
+            <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-tag me-1"></i>Pricing, Inventory & Store Listing Settings</h6>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label small fw-bold">Selling Price (₹) *</label>
+                <div class="input-group">
+                  <span class="input-group-text">₹</span>
+                  <input type="number" step="0.01" id="import-selling-price" class="form-control" value="399.00" required>
+                </div>
+                <div class="form-text small">Price customer pays</div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-bold">List / MRP Price (₹) *</label>
+                <div class="input-group">
+                  <span class="input-group-text">₹</span>
+                  <input type="number" step="0.01" id="import-list-price" class="form-control" value="499.00" required>
+                </div>
+                <div class="form-text small">Printed MRP</div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-bold">Initial Stock Quantity *</label>
+                <input type="number" id="import-stock" class="form-control" value="25" min="0" required>
+                <div class="form-text small">Units in warehouse</div>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <label class="form-label small fw-bold">Description / Synopsis</label>
+              <textarea id="import-desc" class="form-control" rows="3" placeholder="Book description..."></textarea>
+            </div>
+
+            <div class="mt-3 d-flex flex-wrap gap-4">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="import-active" checked>
+                <label class="form-check-label small fw-semibold" for="import-active">Active in Store (Purchasable)</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="import-featured">
+                <label class="form-check-label small" for="import-featured">Feature on Homepage</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="import-bestseller">
+                <label class="form-check-label small" for="import-bestseller">Mark as Bestseller</label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" id="btn-submit-import" class="btn btn-bv-primary px-4">
+              <i class="bi bi-check2-circle me-1"></i>Save & Publish to Store
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bv-footer mt-auto">
+    <div class="container text-center text-muted small py-4">
+      <p class="mb-0">© 2026 BOOKVERSE — Online Book Store and Universal Reading Platform. CSE Final Year Project.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    let currentPage = 1;
+    let currentLimit = 20;
+    let currentTab = 'all';
+    let currentSearchData = { localResults: [], discoveredResults: [] };
+    let isAdminUser = false;
+    let debounceTimer = null;
+
+    function quickSearch(q) {
+      document.getElementById('search-query').value = q;
+      document.getElementById('adv-title').value = '';
+      document.getElementById('adv-author').value = '';
+      document.getElementById('adv-isbn').value = '';
+      document.getElementById('adv-subject').value = '';
+      executeSearch(1);
+    }
+
+    function clearAdvFilters() {
+      document.getElementById('adv-title').value = '';
+      document.getElementById('adv-author').value = '';
+      document.getElementById('adv-isbn').value = '';
+      document.getElementById('adv-subject').value = '';
+    }
+
+    function handleSearchSubmit(e) {
+      e.preventDefault();
+      executeSearch(1);
+    }
+
+    function setTab(tab) {
+      currentTab = tab;
+      document.getElementById('tab-all').classList.toggle('active', tab === 'all');
+      document.getElementById('tab-store').classList.toggle('active', tab === 'store');
+      document.getElementById('tab-discovery').classList.toggle('active', tab === 'discovery');
+      renderResults();
+    }
+
+    function changePage(delta) {
+      executeSearch(currentPage + delta);
+    }
+
+    async function executeSearch(page = 1) {
+      currentPage = page;
+      const q = document.getElementById('search-query').value.trim();
+      const title = document.getElementById('adv-title').value.trim();
+      const author = document.getElementById('adv-author').value.trim();
+      const isbn = document.getElementById('adv-isbn').value.trim();
+      const subject = document.getElementById('adv-subject').value.trim();
+
+      const discoveryGrid = document.getElementById('discovery-grid');
+      const storeGrid = document.getElementById('store-grid');
+
+      discoveryGrid.innerHTML = `
+        <div class="col-12 loading-spinner-wrapper">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">Searching store & global Open Library catalog...</p>
+        </div>
+      `;
+
+      try {
+        const params = new URLSearchParams();
+        if (q) params.set('q', q);
+        if (title) params.set('title', title);
+        if (author) params.set('author', author);
+        if (isbn) params.set('isbn', isbn);
+        if (subject) params.set('subject', subject);
+        params.set('page', currentPage);
+        params.set('limit', currentLimit);
+
+        const res = await Bookverse.apiFetch(`/api/discovery/search?${params.toString()}`);
+        if (res.success && res.data) {
+          currentSearchData = res.data;
+          renderResults();
+        } else {
+          discoveryGrid.innerHTML = '<div class="col-12 empty-state-box">No books found. Try another search term.</div>';
+        }
+      } catch (err) {
+        discoveryGrid.innerHTML = `<div class="col-12"><div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>${err.message}</div></div>`;
+      }
+    }
+
+    function renderResults() {
+      const storeSection = document.getElementById('store-section');
+      const storeGrid = document.getElementById('store-grid');
+      const discoverySection = document.getElementById('discovery-section');
+      const discoveryGrid = document.getElementById('discovery-grid');
+      const statusText = document.getElementById('search-status-text');
+
+      const localBooks = currentSearchData.localResults || [];
+      const discoveredBooks = currentSearchData.discoveredResults || [];
+
+      document.getElementById('count-all').textContent = localBooks.length + discoveredBooks.length;
+      document.getElementById('count-store').textContent = localBooks.length;
+      document.getElementById('count-discovery').textContent = discoveredBooks.length;
+
+      statusText.textContent = `Found ${currentSearchData.totalFound || 0} books across catalog.`;
+
+      // Render Store Results
+      if (currentTab === 'discovery' || localBooks.length === 0) {
+        storeSection.style.display = 'none';
+      } else {
+        storeSection.style.display = 'block';
+        storeGrid.innerHTML = localBooks.map(b => Bookverse.renderBookCard(b)).join('');
+      }
+
+      // Render Discovery Results
+      if (currentTab === 'store') {
+        discoverySection.style.display = 'none';
+      } else {
+        discoverySection.style.display = 'block';
+        if (discoveredBooks.length === 0) {
+          discoveryGrid.innerHTML = '<div class="col-12 empty-state-box">No external books found for this query.</div>';
+        } else {
+          discoveryGrid.innerHTML = discoveredBooks.map(b => renderDiscoveredCard(b)).join('');
+        }
+      }
+
+      // Pagination
+      const pagination = document.getElementById('pagination-controls');
+      if (currentTab !== 'store' && discoveredBooks.length > 0) {
+        pagination.style.display = 'flex';
+        document.getElementById('btn-prev-page').disabled = (currentPage <= 1);
+        document.getElementById('btn-next-page').disabled = !currentSearchData.hasMoreExternal;
+        document.getElementById('page-display').textContent = `Page ${currentPage}`;
+      } else {
+        pagination.style.display = 'none';
+      }
+    }
+
+    function renderDiscoveredCard(b) {
+      const coverUrl = b.coverImageUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80';
+      const yearText = b.firstPublishYear > 0 ? b.firstPublishYear : 'N/A';
+      const editionText = b.editionCount > 1 ? `${b.editionCount} editions` : '1 edition';
+
+      let actionButtons = '';
+      if (b.inStore) {
+        actionButtons = `
+          <div class="d-flex gap-2">
+            <a href="/book-details.html?slug=${b.storeSlug}" class="btn btn-sm btn-success flex-grow-1">
+              <i class="bi bi-cart-check me-1"></i>In Store (${Bookverse.formatCurrency(b.sellingPrice)})
+            </a>
+            <button class="btn btn-sm btn-outline-secondary px-2" onclick="openWorkModal('${b.key}')" title="Discovery Details">
+              <i class="bi bi-info-circle"></i>
+            </button>
+          </div>
+        `;
+      } else {
+        actionButtons = `
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary flex-grow-1" onclick="openWorkModal('${b.key}')">
+              <i class="bi bi-eye me-1"></i>View Details
+            </button>
+            ${isAdminUser ? `
+              <button class="btn btn-sm btn-bv-primary" onclick="openAdminImportModal(${JSON.stringify(b).replace(/"/g, '&quot;')})" title="Administrator Import">
+                <i class="bi bi-cloud-arrow-down me-1"></i>Import
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      return `
+        <div class="col-6 col-md-4 col-lg-3 mb-4">
+          <div class="discovery-card h-100">
+            <div class="discovery-cover-wrap">
+              <img src="${coverUrl}" alt="${b.title}" class="discovery-cover-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80'">
+              <div class="discovery-badges">
+                ${b.inStore ? '<span class="badge-bv-instore"><i class="bi bi-check-circle"></i>In Store</span>' : '<span class="badge-bv-discovery"><i class="bi bi-globe"></i>Open Library</span>'}
+                <span class="badge bg-dark bg-opacity-75">${yearText}</span>
+              </div>
+            </div>
+            <div class="book-card-body p-3 d-flex flex-column flex-grow-1">
+              <div class="text-muted small text-truncate mb-1">${b.publisher || (b.subjects && b.subjects[0]) || 'General'}</div>
+              <h6 class="book-title fw-bold mb-1" title="${b.title}">
+                <a href="#" onclick="openWorkModal('${b.key}'); return false;" class="text-decoration-none text-dark">${b.title}</a>
+              </h6>
+              <div class="book-author text-muted small mb-2">${b.authorName || 'Various Authors'}</div>
+              <div class="small text-muted mb-3"><i class="bi bi-layers me-1"></i>${editionText} ${b.pageCount > 0 ? `• ~${b.pageCount} pages` : ''}</div>
+              <div class="mt-auto">
+                ${actionButtons}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function openWorkModal(key) {
+      if (!key) return;
+      const modal = new bootstrap.Modal(document.getElementById('workDetailsModal'));
+      modal.show();
+      const body = document.getElementById('workModalBody');
+      body.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+
+      try {
+        const res = await Bookverse.apiFetch(`/api/discovery/work?key=${encodeURIComponent(key)}`);
+        if (res.success && res.data) {
+          const w = res.data;
+          document.getElementById('workModalTitle').textContent = w.title;
+          const coverImg = (w.covers && w.covers.length > 0) ? w.covers[0] : 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80';
+          
+          body.innerHTML = `
+            <div class="row g-4">
+              <div class="col-md-4 text-center">
+                <img src="${coverImg}" alt="${w.title}" class="img-fluid rounded shadow-sm mb-3" style="max-height: 280px;">
+                ${w.inStore ? `
+                  <a href="/book-details.html?slug=${w.storeSlug}" class="btn btn-success w-100">
+                    <i class="bi bi-cart-check me-1"></i>View in Store
+                  </a>
+                ` : (isAdminUser ? `
+                  <button class="btn btn-bv-primary w-100" onclick="prepareImportFromWork('${w.key}', '${escapeForJs(w.title)}', '${escapeForJs(w.description || '')}', '${coverImg}')">
+                    <i class="bi bi-cloud-arrow-down me-1"></i>Import to Store
+                  </button>
+                ` : `
+                  <div class="badge bg-secondary p-2 w-100">Catalog Discovery Item</div>
+                `)}
+              </div>
+              <div class="col-md-8">
+                <h4 class="fw-bold mb-2">${w.title}</h4>
+                <div class="text-muted mb-3"><i class="bi bi-key me-1"></i>Open Library Key: <code>${w.key}</code></div>
+                <h6 class="fw-bold mb-2">Description / Synopsis</h6>
+                <div class="small text-muted mb-4" style="max-height: 200px; overflow-y: auto; white-space: pre-line;">
+                  ${w.description || 'No detailed synopsis available for this edition in Open Library records.'}
+                </div>
+                ${w.subjects && w.subjects.length > 0 ? `
+                  <h6 class="fw-bold mb-2">Subjects & Topics</h6>
+                  <div class="d-flex flex-wrap gap-1 mb-3">
+                    ${w.subjects.map(s => `<span class="badge bg-light text-dark border">${s}</span>`).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        body.innerHTML = `<div class="alert alert-danger">${err.message}</div>`;
+      }
+    }
+
+    function escapeForJs(str) {
+      if (!str) return '';
+      return str.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ');
+    }
+
+    function openAdminImportModal(b) {
+      document.getElementById('import-work-key').value = b.key || '';
+      document.getElementById('import-title').value = b.title || '';
+      document.getElementById('import-authors').value = b.authorName || (b.authors ? b.authors.join(', ') : '');
+      document.getElementById('import-publisher').value = b.publisher || '';
+      document.getElementById('import-category').value = (b.subjects && b.subjects[0]) || 'General';
+      document.getElementById('import-year').value = b.firstPublishYear > 0 ? b.firstPublishYear : 2022;
+      document.getElementById('import-pages').value = b.pageCount > 0 ? b.pageCount : 250;
+      document.getElementById('import-desc').value = b.description || `Insightful work discovered from Open Library global catalog.`;
+      
+      const coverUrl = b.coverImageUrl || '';
+      document.getElementById('import-cover-url').value = coverUrl;
+      document.getElementById('import-preview-img').src = coverUrl;
+
+      const isbnText = b.isbn13 ? `ISBN-13: ${b.isbn13}` : (b.isbn10 ? `ISBN-10: ${b.isbn10}` : 'No ISBN registered');
+      document.getElementById('import-isbn-display').textContent = isbnText;
+
+      const modal = new bootstrap.Modal(document.getElementById('adminImportModal'));
+      modal.show();
+    }
+
+    function prepareImportFromWork(key, title, desc, coverUrl) {
+      bootstrap.Modal.getInstance(document.getElementById('workDetailsModal')).hide();
+      openAdminImportModal({
+        key: key,
+        title: title,
+        authorName: 'Various Authors',
+        description: desc,
+        coverImageUrl: coverUrl,
+        firstPublishYear: 2022,
+        pageCount: 250
+      });
+    }
+
+    async function submitAdminImport(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit-import');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Importing...';
+
+      const payload = {
+        openLibraryKey: document.getElementById('import-work-key').value,
+        title: document.getElementById('import-title').value.trim(),
+        authorName: document.getElementById('import-authors').value.trim(),
+        publisherName: document.getElementById('import-publisher').value.trim(),
+        categoryName: document.getElementById('import-category').value.trim(),
+        publicationYear: parseInt(document.getElementById('import-year').value) || 2022,
+        pageCount: parseInt(document.getElementById('import-pages').value) || 250,
+        coverImageUrl: document.getElementById('import-cover-url').value,
+        description: document.getElementById('import-desc').value.trim(),
+        sellingPrice: parseFloat(document.getElementById('import-selling-price').value),
+        listPrice: parseFloat(document.getElementById('import-list-price').value),
+        stockQuantity: parseInt(document.getElementById('import-stock').value),
+        active: document.getElementById('import-active').checked,
+        featured: document.getElementById('import-featured').checked,
+        bestseller: document.getElementById('import-bestseller').checked
+      };
+
+      try {
+        const res = await Bookverse.apiFetch('/api/admin/books/import-discovered', {
+          method: 'POST',
+          body: payload
+        });
+        Bookverse.showToast(`"${res.data.title}" imported successfully to store!`, 'success');
+        bootstrap.Modal.getInstance(document.getElementById('adminImportModal')).hide();
+        executeSearch(currentPage); // refresh results to mark as in-store
+      } catch (err) {
+        Bookverse.showToast(err.message || 'Import failed', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-check2-circle me-1"></i>Save & Publish to Store';
+      }
+    }
+
+    // Debounced Autocomplete Setup
+    const searchInput = document.getElementById('search-query');
+    const autoBox = document.getElementById('autocomplete-box');
+
+    searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      const val = searchInput.value.trim();
+      if (val.length < 2) {
+        autoBox.style.display = 'none';
+        return;
+      }
+      debounceTimer = setTimeout(async () => {
+        try {
+          const res = await Bookverse.apiFetch(`/api/books/search?q=${encodeURIComponent(val)}&size=4`);
+          let html = '';
+          if (res.data && res.data.content && res.data.content.length > 0) {
+            html += '<div class="px-3 py-1 bg-light small fw-bold text-muted border-bottom">Available in Store</div>';
+            res.data.content.forEach(b => {
+              html += `
+                <a href="/book-details.html?slug=${b.slug}" class="search-autocomplete-item">
+                  <img src="${b.coverImageUrl || ''}" class="search-autocomplete-thumb" onerror="this.src='https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80'">
+                  <div class="flex-grow-1">
+                    <div class="fw-semibold text-dark">${b.title}</div>
+                    <div class="small text-muted">${b.authorName} • <span class="text-success fw-bold">${Bookverse.formatCurrency(b.sellingPrice)}</span></div>
+                  </div>
+                </a>
+              `;
+            });
+          }
+          html += `
+            <div class="p-2 bg-light border-top text-center">
+              <a href="#" onclick="quickSearch('${escapeForJs(val)}'); autoBox.style.display='none'; return false;" class="btn btn-sm btn-outline-primary w-100">
+                <i class="bi bi-globe me-1"></i>Search All World Books on Open Library for "${val}"
+              </a>
+            </div>
+          `;
+          autoBox.innerHTML = html;
+          autoBox.style.display = 'block';
+        } catch (e) {
+          autoBox.style.display = 'none';
+        }
+      }, 250);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#search-form')) {
+        autoBox.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Bookverse.initNavbar();
+      if (Bookverse.currentUser && Bookverse.currentUser.roles && Bookverse.currentUser.roles.includes('ROLE_ADMIN')) {
+        isAdminUser = true;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const qParam = params.get('q') || 'Meditations';
+      document.getElementById('search-query').value = qParam;
+      executeSearch(1);
+    });
+  </script>
+</body>
+</html>

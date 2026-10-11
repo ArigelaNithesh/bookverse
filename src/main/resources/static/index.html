@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOKVERSE — Online Bookstore & Digital Reading Platform</title>
+  <meta name="description" content="A modern online bookstore and digital reading platform built with Java 21, Spring Boot 3, and MySQL. Final-year CSE engineering project.">
+
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Bookverse Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg bv-navbar sticky-top">
+    <div class="container">
+      <a class="bv-brand" href="/index.html">
+        <i class="bi bi-book-half fs-3"></i>
+        <span>BOOKVERSE</span>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#bvNavbarContent" aria-controls="bvNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="bvNavbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+          <li class="nav-item">
+            <a class="nav-link bv-nav-link active" href="/index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link bv-nav-link" href="/books.html">Browse Books</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link bv-nav-link" href="/categories.html">Categories</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link bv-nav-link" href="/read.html">
+              <i class="bi bi-journal-richtext text-primary me-1"></i>Digital Reader
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link bv-nav-link" href="/about.html">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link bv-nav-link" href="/contact.html">Contact</a>
+          </li>
+        </ul>
+
+        <!-- Search Bar -->
+        <form class="d-flex me-3 my-2 my-lg-0" action="/search.html" method="GET">
+          <div class="input-group input-group-sm">
+            <input type="text" name="q" class="form-control rounded-start-pill ps-3" placeholder="Search title, author, ISBN..." style="min-width: 200px;">
+            <button class="btn btn-bv-primary rounded-end-pill px-3" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </form>
+
+        <!-- Wishlist, Cart & User Action Buttons -->
+        <div class="d-flex align-items-center gap-2">
+          <a href="/wishlist.html" class="btn btn-sm btn-bv-outline position-relative px-2 py-1" title="Wishlist">
+            <i class="bi bi-heart fs-6"></i>
+            <span id="wishlist-counter-badge" class="nav-badge" style="display: none;">0</span>
+          </a>
+
+          <a href="/cart.html" class="btn btn-sm btn-bv-outline position-relative px-2 py-1" title="Shopping Cart">
+            <i class="bi bi-cart3 fs-6"></i>
+            <span id="cart-counter-badge" class="nav-badge" style="display: none;">0</span>
+          </a>
+
+          <div id="nav-user-slot" class="d-flex align-items-center gap-2">
+            <!-- Populated dynamically by app.js -->
+            <a href="/login.html" class="btn btn-sm btn-bv-outline">Sign In</a>
+            <a href="/register.html" class="btn btn-sm btn-bv-primary">Register</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container mb-5">
+
+    <!-- HERO BANNER -->
+    <div class="hero-banner p-4 p-md-5">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <div class="hero-badge">
+            <i class="bi bi-mortarboard-fill text-warning"></i>
+            <span>Final-Year CSE Project • Full-Stack Java 21 & Spring Boot 3</span>
+          </div>
+          <h1 class="display-5 fw-bold text-white mb-3">Where Stories Meet Knowledge.</h1>
+          <p class="lead text-light mb-4" style="opacity: 0.92; max-width: 650px;">
+            Discover books of all genres from around the world — Novels, Philosophy, Self-Help, Classic Literature, Psychology, History, Business, Science, and Programming. Powered by Open Library universal discovery.
+          </p>
+
+          <form action="/search.html" method="GET" class="hero-search-wrapper">
+            <div class="input-group">
+              <input type="text" name="q" class="form-control hero-search-input" placeholder="Search millions of books by title, author, category, or ISBN...">
+              <button class="btn hero-search-btn" type="submit">
+                <i class="bi bi-search me-1"></i> Search
+              </button>
+            </div>
+          </form>
+
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            <a href="/search.html" class="btn btn-warning fw-semibold px-4 py-2 rounded-pill text-dark">
+              <i class="bi bi-globe me-1"></i> Universal Discovery
+            </a>
+            <a href="/books.html" class="btn btn-outline-light px-4 py-2 rounded-pill">
+              <i class="bi bi-grid-fill me-1"></i> Store Catalog
+            </a>
+            <a href="/read.html" class="btn btn-outline-light px-4 py-2 rounded-pill">
+              <i class="bi bi-book me-1"></i> Read Online
+            </a>
+            <a href="/admin/index.html" class="btn btn-outline-light px-4 py-2 rounded-pill">
+              <i class="bi bi-speedometer2 me-1"></i> Admin Portal
+            </a>
+          </div>
+        </div>
+
+        <div class="col-lg-4 d-none d-lg-block text-center position-relative">
+          <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80" 
+               alt="Bookverse Showcase" 
+               class="img-fluid rounded-4 shadow-lg border border-2 border-white"
+               style="max-height: 340px; object-fit: cover; transform: rotate(-3deg);">
+        </div>
+      </div>
+    </div>
+
+    <!-- DEMO CREDENTIALS NOTICE -->
+    <div class="demo-banner d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-info-circle-fill text-warning fs-5"></i>
+        <span><strong>Evaluator Quick Demo Credentials:</strong> Admin: <code>admin@bookverse.com</code> / <code>Admin@123456</code> | Student: <code>student@bookverse.com</code> / <code>Student@123456</code></span>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="/login.html" class="btn btn-sm btn-warning text-dark fw-medium px-3 py-1">Quick Login</a>
+      </div>
+    </div>
+
+    <!-- CATEGORY CHIPS -->
+    <section class="mt-5">
+      <h5 class="text-muted fw-bold text-uppercase small mb-3 letter-spacing-1">Popular Subject Categories</h5>
+      <div class="d-flex flex-wrap gap-2" id="category-chips-container">
+        <a href="/books.html?category=programming" class="category-chip">
+          <i class="bi bi-code-slash text-danger"></i> Programming
+        </a>
+        <a href="/books.html?category=web-development" class="category-chip">
+          <i class="bi bi-globe2 text-primary"></i> Web Development
+        </a>
+        <a href="/books.html?category=computer-science" class="category-chip">
+          <i class="bi bi-cpu text-info"></i> Computer Science
+        </a>
+        <a href="/books.html?category=academics" class="category-chip">
+          <i class="bi bi-calculator text-success"></i> Academics & Math
+        </a>
+        <a href="/books.html?category=literature" class="category-chip">
+          <i class="bi bi-feather text-warning"></i> Literature & Classics
+        </a>
+        <a href="/books.html?category=philosophy" class="category-chip">
+          <i class="bi bi-lightbulb text-secondary"></i> Philosophy
+        </a>
+        <a href="/books.html?category=self-help" class="category-chip">
+          <i class="bi bi-heart-pulse text-danger"></i> Self-Help
+        </a>
+        <a href="/categories.html" class="category-chip bg-white border-primary text-primary">
+          <i class="bi bi-arrow-right-circle"></i> View All (100+)
+        </a>
+      </div>
+    </section>
+
+    <!-- FEATURED BOOKS SECTION -->
+    <section class="mt-5">
+      <div class="section-header">
+        <h2 class="section-title">Featured Books</h2>
+        <a href="/books.html?featured=true" class="text-decoration-none fw-semibold small text-primary">
+          View All <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="row" id="featured-books-row">
+        <!-- Loading spinner -->
+        <div class="col-12 loading-spinner-wrapper">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">Fetching curated books from Bookverse database...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIGITAL READING BANNER -->
+    <section class="mt-5">
+      <div class="reading-promo-card">
+        <div class="row align-items-center">
+          <div class="col-lg-8">
+            <span class="badge bg-success text-white mb-2 px-3 py-1 text-uppercase">Public Domain & Authorized Reading</span>
+            <h2 class="display-6 fw-bold text-white mb-3">Read Timeless Classics Instantly.</h2>
+            <p class="text-light lead fs-6 mb-4" style="opacity: 0.9;">
+              Enjoy authorized full-text reading of world classics including <em>Pride and Prejudice</em>, <em>Frankenstein</em>, and Plato's <em>The Republic</em> directly in your browser. Features font scaling, dark mode, and cloud bookmark sync.
+            </p>
+            <div class="d-flex gap-3">
+              <a href="/read.html" class="btn btn-light fw-semibold px-4 py-2 rounded-pill">
+                <i class="bi bi-journal-text me-1"></i> Open Digital Reader
+              </a>
+              <a href="/books.html?digitalAvailable=true" class="btn btn-outline-light px-4 py-2 rounded-pill">
+                View Digital Books
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-4 d-none d-lg-block text-center">
+            <i class="bi bi-book-half text-warning" style="font-size: 7rem; opacity: 0.85;"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BESTSELLERS SECTION -->
+    <section class="mt-5">
+      <div class="section-header">
+        <h2 class="section-title">Bestselling Titles</h2>
+        <a href="/books.html?bestseller=true" class="text-decoration-none fw-semibold small text-primary">
+          View All <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="row" id="bestseller-books-row">
+        <div class="col-12 loading-spinner-wrapper">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="mt-2 text-muted">Loading top rated bestsellers...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWSLETTER SUBSCRIPTION -->
+    <section class="mt-5">
+      <div class="newsletter-card">
+        <div class="row justify-content-center">
+          <div class="col-lg-7 text-center">
+            <i class="bi bi-envelope-paper-heart fs-1 text-danger mb-2 d-block"></i>
+            <h3 class="fw-bold mb-2">Join the BookVerse Community</h3>
+            <p class="text-muted mb-4">
+              Get notified of new book arrivals, curriculum recommendations, academic discounts, and open-source updates.
+            </p>
+            <form id="newsletter-form" class="row g-2 justify-content-center">
+              <div class="col-sm-8">
+                <input type="email" id="newsletter-email" class="form-control form-control-lg rounded-pill px-4" placeholder="Enter your email address" required>
+              </div>
+              <div class="col-sm-4">
+                <button type="submit" class="btn btn-bv-primary btn-lg w-100 rounded-pill">Subscribe</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bv-footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4 col-md-6">
+          <div class="d-flex align-items-center gap-2 text-white mb-3">
+            <i class="bi bi-book-half fs-3 text-warning"></i>
+            <h5 class="mb-0 fw-bold">BOOKVERSE</h5>
+          </div>
+          <p class="small pe-lg-4">
+            An end-to-end Online Bookstore and Digital Reading Platform engineered with Java 21, Spring Boot 3.3, and MySQL. Featuring atomic inventory management, Open Library metadata import, and public domain reading interfaces.
+          </p>
+          <div class="d-flex gap-3 fs-5">
+            <a href="#"><i class="bi bi-github"></i></a>
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+            <a href="#"><i class="bi bi-envelope"></i></a>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <h5>Catalog</h5>
+          <ul class="list-unstyled small d-flex flex-column gap-2">
+            <li><a href="/books.html">All Books</a></li>
+            <li><a href="/categories.html">Categories</a></li>
+            <li><a href="/books.html?featured=true">Featured Books</a></li>
+            <li><a href="/books.html?bestseller=true">Bestsellers</a></li>
+            <li><a href="/read.html">Digital Reader</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <h5>Account</h5>
+          <ul class="list-unstyled small d-flex flex-column gap-2">
+            <li><a href="/login.html">Sign In</a></li>
+            <li><a href="/register.html">Register</a></li>
+            <li><a href="/cart.html">Shopping Cart</a></li>
+            <li><a href="/wishlist.html">Wishlist</a></li>
+            <li><a href="/orders.html">Order History</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <h5>Project Architecture</h5>
+          <p class="small mb-2">
+            <strong>Backend:</strong> Java 21 • Spring Boot 3.3.2 • Spring Security • JPA/Hibernate<br>
+            <strong>Database:</strong> MySQL 8 • Flyway Schema Migrations<br>
+            <strong>API Specs:</strong> Springdoc OpenAPI Swagger at <code>/swagger-ui.html</code>
+          </p>
+          <div class="mt-3">
+            <a href="/admin/index.html" class="btn btn-sm btn-outline-warning text-warning">
+              <i class="bi bi-lock-fill me-1"></i> Admin Portal
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="bv-footer-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <p class="mb-0">&copy; 2026 BOOKVERSE. Final-Year CSE Major Project. All rights reserved.</p>
+        <div class="d-flex gap-3">
+          <a href="/about.html">Architecture & Docs</a>
+          <a href="/swagger-ui.html" target="_blank">OpenAPI Docs</a>
+          <a href="/contact.html">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Bookverse Client JS -->
+  <script src="/js/app.js"></script>
+
+  <!-- Homepage Dynamic Data Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Fetch Featured Books
+      try {
+        const featuredRes = await fetch('/api/books/featured');
+        const featuredData = await featuredRes.json();
+        const container = document.getElementById('featured-books-row');
+        if (container && featuredData.success && featuredData.data && featuredData.data.length > 0) {
+          container.innerHTML = featuredData.data.map(b => Bookverse.renderBookCard(b)).join('');
+        } else if (container) {
+          container.innerHTML = `<div class="col-12 empty-state-box"><i class="bi bi-book fs-3 mb-2 d-block"></i>No featured books available at the moment.</div>`;
+        }
+      } catch (e) {
+        document.getElementById('featured-books-row').innerHTML = `<div class="col-12 text-center text-danger p-4">Unable to load featured books. Please ensure the backend is running.</div>`;
+      }
+
+      // 2. Fetch Bestsellers
+      try {
+        const bestRes = await fetch('/api/books/bestsellers');
+        const bestData = await bestRes.json();
+        const container = document.getElementById('bestseller-books-row');
+        if (container && bestData.success && bestData.data && bestData.data.length > 0) {
+          container.innerHTML = bestData.data.map(b => Bookverse.renderBookCard(b)).join('');
+        } else if (container) {
+          container.innerHTML = `<div class="col-12 empty-state-box"><i class="bi bi-star fs-3 mb-2 d-block"></i>No bestsellers listed yet.</div>`;
+        }
+      } catch (e) {
+        document.getElementById('bestseller-books-row').innerHTML = `<div class="col-12 text-center text-danger p-4">Unable to load bestsellers.</div>`;
+      }
+
+      // 3. Newsletter Submission
+      const nForm = document.getElementById('newsletter-form');
+      if (nForm) {
+        nForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const emailInput = document.getElementById('newsletter-email');
+          const email = emailInput.value.trim();
+          if (!email) return;
+
+          try {
+            const res = await Bookverse.apiFetch('/api/newsletter/subscribe', {
+              method: 'POST',
+              body: { email }
+            });
+            Bookverse.showToast("Thank you! You are now subscribed to BookVerse updates.", "success");
+            emailInput.value = '';
+          } catch (err) {
+            Bookverse.showToast(err.message || "Newsletter subscription failed", "error");
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

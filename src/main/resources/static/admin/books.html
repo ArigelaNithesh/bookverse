@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Books — BOOKVERSE Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-light">
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg bv-navbar sticky-top bg-white border-bottom shadow-sm">
+    <div class="container-fluid px-4">
+      <a class="bv-brand" href="/admin/index.html"><i class="bi bi-book-half fs-3"></i><span>BOOKVERSE <span class="badge bg-danger ms-2 fs-6">ADMIN</span></span></a>
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <a href="/search.html" class="btn btn-sm btn-outline-primary"><i class="bi bi-globe me-1"></i>Universal Discovery</a>
+        <a href="/books.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-shop me-1"></i>Storefront</a>
+        <div id="nav-user-slot"></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-4 py-4">
+    <div class="row">
+      <!-- SIDEBAR -->
+      <div class="col-lg-2 mb-4">
+        <div class="list-group shadow-sm border-0 rounded-3">
+          <a href="/admin/index.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+          </a>
+          <a href="/admin/books.html" class="list-group-item list-group-item-action active fw-semibold">
+            <i class="bi bi-journal-album me-2"></i>Manage Books
+          </a>
+          <a href="/admin/import.html" class="list-group-item list-group-item-action text-primary fw-semibold">
+            <i class="bi bi-cloud-arrow-down me-2"></i>Import Open Library
+          </a>
+          <a href="/admin/orders.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-box-seam me-2"></i>Orders
+          </a>
+          <a href="/admin/customers.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-people me-2"></i>Customers
+          </a>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div class="col-lg-10">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+          <div>
+            <h3 class="fw-bold mb-1 brand-font">Local Store Inventory</h3>
+            <p class="text-muted small mb-0">Search, edit prices, manage warehouse stock, and activate/deactivate book listings.</p>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="/admin/import.html" class="btn btn-bv-primary">
+              <i class="bi bi-cloud-arrow-down me-1"></i>Import from Open Library
+            </a>
+          </div>
+        </div>
+
+        <!-- SEARCH & FILTER BAR -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-body">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-5">
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
+                  <input type="text" id="admin-search-input" class="form-control" placeholder="Search books by title, author, or ISBN..." onkeyup="if(event.key==='Enter') loadAdminBooks(0)">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <select id="admin-category-filter" class="form-select" onchange="loadAdminBooks(0)">
+                  <option value="">All Categories</option>
+                </select>
+              </div>
+              <div class="col-md-3 text-end">
+                <button class="btn btn-secondary px-3" onclick="loadAdminBooks(0)">Filter</button>
+                <button class="btn btn-outline-secondary ms-1" onclick="resetFilters()">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOOKS TABLE -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-muted">
+                  <tr>
+                    <th>Cover</th>
+                    <th>Title & Author</th>
+                    <th>Category</th>
+                    <th>Selling Price</th>
+                    <th>MRP / List</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="books-table-body">
+                  <tr><td colspan="8" class="text-center py-5 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading books...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- PAGINATION -->
+          <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+            <span class="small text-muted" id="page-info">Showing page 1</span>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-outline-secondary" id="prev-btn" onclick="navPage(-1)" disabled>Previous</button>
+              <button class="btn btn-sm btn-outline-secondary" id="next-btn" onclick="navPage(1)" disabled>Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT BOOK MODAL -->
+  <div class="modal fade" id="editBookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="editModalTitle">Edit Book</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="editBookForm" onsubmit="saveBookEdits(event)">
+          <div class="modal-body">
+            <input type="hidden" id="edit-book-id">
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Selling Price (₹)</label>
+              <input type="number" step="0.01" id="edit-selling-price" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">List Price (₹)</label>
+              <input type="number" step="0.01" id="edit-list-price" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Stock Quantity</label>
+              <input type="number" id="edit-stock" class="form-control" min="0" required>
+            </div>
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" id="edit-active">
+              <label class="form-check-label small" for="edit-active">Active Listing (Available to Customers)</label>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-bv-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    let currentAdminPage = 0;
+    let totalAdminPages = 1;
+    let activeBooksMap = {};
+
+    function resetFilters() {
+      document.getElementById('admin-search-input').value = '';
+      document.getElementById('admin-category-filter').value = '';
+      loadAdminBooks(0);
+    }
+
+    function navPage(delta) {
+      loadAdminBooks(currentAdminPage + delta);
+    }
+
+    async function loadAdminCategories() {
+      try {
+        const res = await Bookverse.apiFetch('/api/categories');
+        if (res.success && res.data) {
+          const sel = document.getElementById('admin-category-filter');
+          res.data.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.textContent = c.name;
+            sel.appendChild(opt);
+          });
+        }
+      } catch (e) {}
+    }
+
+    async function loadAdminBooks(page = 0) {
+      currentAdminPage = page;
+      const kw = document.getElementById('admin-search-input').value.trim();
+      const catId = document.getElementById('admin-category-filter').value;
+      const tbody = document.getElementById('books-table-body');
+
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading books...</td></tr>';
+
+      try {
+        const params = new URLSearchParams({ page: currentAdminPage, size: 15 });
+        if (kw) params.set('keyword', kw);
+        if (catId) params.set('categoryId', catId);
+
+        const res = await Bookverse.apiFetch(`/api/admin/books?${params.toString()}`);
+        if (res.success && res.data) {
+          const p = res.data;
+          totalAdminPages = p.totalPages || 1;
+          document.getElementById('page-info').textContent = `Showing page ${currentAdminPage + 1} of ${totalAdminPages} (${p.totalElements} total books)`;
+          document.getElementById('prev-btn').disabled = (currentAdminPage <= 0);
+          document.getElementById('next-btn').disabled = (currentAdminPage >= totalAdminPages - 1);
+
+          activeBooksMap = {};
+          if (p.content && p.content.length > 0) {
+            tbody.innerHTML = p.content.map(b => {
+              activeBooksMap[b.id] = b;
+              const stockClass = b.stockQuantity <= 5 ? 'text-danger fw-bold' : 'text-success';
+              return `
+                <tr>
+                  <td style="width: 50px;">
+                    <img src="${b.coverImageUrl || ''}" alt="Cover" style="width: 38px; height: 50px; object-fit: cover;" class="rounded" onerror="this.src='https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80'">
+                  </td>
+                  <td>
+                    <div class="fw-bold text-dark text-truncate" style="max-width: 280px;" title="${b.title}">${b.title}</div>
+                    <div class="small text-muted">${b.authorName || 'Unknown'}</div>
+                  </td>
+                  <td><span class="badge bg-light text-dark border">${b.categoryName || 'General'}</span></td>
+                  <td class="fw-bold">${Bookverse.formatCurrency(b.sellingPrice)}</td>
+                  <td class="text-muted small">${Bookverse.formatCurrency(b.listPrice)}</td>
+                  <td><span class="${stockClass}">${b.stockQuantity} in stock</span></td>
+                  <td>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" ${b.active ? 'checked' : ''} onchange="toggleBookStatus(${b.id}, this.checked)">
+                      <label class="form-check-label small">${b.active ? 'Active' : 'Inactive'}</label>
+                    </div>
+                  </td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-secondary me-1" onclick="openEditModal(${b.id})" title="Edit Details">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <a href="/book-details.html?slug=${b.slug}" target="_blank" class="btn btn-sm btn-outline-primary" title="View Store Page">
+                      <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+          } else {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted">No books found matching criteria.</td></tr>';
+          }
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-danger">${err.message}</td></tr>`;
+      }
+    }
+
+    async function toggleBookStatus(id, active) {
+      try {
+        await Bookverse.apiFetch(`/api/admin/books/${id}/status`, {
+          method: 'PATCH',
+          body: { active: active }
+        });
+        Bookverse.showToast(`Book status set to ${active ? 'Active' : 'Inactive'}`, 'success');
+      } catch (e) {
+        Bookverse.showToast(e.message || 'Status update failed', 'error');
+        loadAdminBooks(currentAdminPage);
+      }
+    }
+
+    function openEditModal(id) {
+      const b = activeBooksMap[id];
+      if (!b) return;
+      document.getElementById('edit-book-id').value = b.id;
+      document.getElementById('editModalTitle').textContent = `Edit "${b.title}"`;
+      document.getElementById('edit-selling-price').value = b.sellingPrice;
+      document.getElementById('edit-list-price').value = b.listPrice;
+      document.getElementById('edit-stock').value = b.stockQuantity;
+      document.getElementById('edit-active').checked = b.active;
+
+      const modal = new bootstrap.Modal(document.getElementById('editBookModal'));
+      modal.show();
+    }
+
+    async function saveBookEdits(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-book-id').value;
+      const newStock = parseInt(document.getElementById('edit-stock').value);
+      const newSelling = parseFloat(document.getElementById('edit-selling-price').value);
+      const newList = parseFloat(document.getElementById('edit-list-price').value);
+      const newActive = document.getElementById('edit-active').checked;
+
+      try {
+        // Fetch full book dto, update changed values, and save
+        const curRes = await Bookverse.apiFetch(`/api/books/${id}`);
+        if (curRes.success && curRes.data) {
+          const dto = curRes.data;
+          dto.sellingPrice = newSelling;
+          dto.listPrice = newList;
+          dto.stockQuantity = newStock;
+          dto.active = newActive;
+          await Bookverse.apiFetch(`/api/admin/books/${id}`, {
+            method: 'PUT',
+            body: dto
+          });
+          Bookverse.showToast("Book updated successfully", "success");
+          bootstrap.Modal.getInstance(document.getElementById('editBookModal')).hide();
+          loadAdminBooks(currentAdminPage);
+        }
+      } catch (err) {
+        Bookverse.showToast(err.message || 'Update failed', 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Bookverse.initNavbar();
+      loadAdminCategories();
+      loadAdminBooks(0);
+    });
+  </script>
+</body>
+</html>

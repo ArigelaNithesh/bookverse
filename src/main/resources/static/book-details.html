@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Details — BOOKVERSE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg bv-navbar sticky-top">
+    <div class="container">
+      <a class="bv-brand" href="/index.html"><i class="bi bi-book-half fs-3"></i><span>BOOKVERSE</span></a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#bvNavbarContent"><span class="navbar-toggler-icon"></span></button>
+      <div class="collapse navbar-collapse" id="bvNavbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+          <li class="nav-item"><a class="nav-link bv-nav-link" href="/index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link bv-nav-link active" href="/books.html">Browse Books</a></li>
+          <li class="nav-item"><a class="nav-link bv-nav-link" href="/categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link bv-nav-link" href="/read.html">Digital Reader</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-2">
+          <a href="/wishlist.html" class="btn btn-sm btn-bv-outline position-relative px-2 py-1"><i class="bi bi-heart fs-6"></i><span id="wishlist-counter-badge" class="nav-badge" style="display: none;">0</span></a>
+          <a href="/cart.html" class="btn btn-sm btn-bv-outline position-relative px-2 py-1"><i class="bi bi-cart3 fs-6"></i><span id="cart-counter-badge" class="nav-badge" style="display: none;">0</span></a>
+          <div id="nav-user-slot" class="d-flex align-items-center gap-2"></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4" id="details-main">
+    <div class="text-center py-5" id="details-loading">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted">Loading book details...</p>
+    </div>
+
+    <div id="details-content" style="display: none;">
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+          <li class="breadcrumb-item"><a href="/index.html" class="text-decoration-none">Home</a></li>
+          <li class="breadcrumb-item"><a href="/books.html" class="text-decoration-none">Books</a></li>
+          <li class="breadcrumb-item active" id="bc-title" aria-current="page">Details</li>
+        </ol>
+      </nav>
+
+      <div class="row g-4 mt-1">
+        <!-- Cover image column -->
+        <div class="col-md-4 col-lg-3 text-center">
+          <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-2 bg-white">
+            <img id="book-cover" src="" alt="Cover" class="img-fluid rounded-3 w-100 shadow-sm" style="max-height: 420px; object-fit: cover;">
+          </div>
+          <div id="digital-read-shortcut" class="mt-3 d-grid" style="display: none;">
+            <a id="digital-read-btn" href="#" class="btn btn-success fw-semibold py-2 rounded-pill">
+              <i class="bi bi-book-half me-1"></i> Read Online Free
+            </a>
+          </div>
+        </div>
+
+        <!-- Info column -->
+        <div class="col-md-8 col-lg-6">
+          <span class="badge bg-light text-primary border border-primary-subtle text-uppercase mb-2 px-3 py-1" id="book-category">Category</span>
+          <h1 class="h2 fw-bold text-dark mb-1" id="book-title">Title</h1>
+          <p class="lead fs-6 text-muted mb-3" id="book-authors">Authors</p>
+
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="d-flex align-items-center text-warning fs-5">
+              <i class="bi bi-star-fill me-1"></i>
+              <span class="fw-bold text-dark fs-5" id="book-rating">0.0</span>
+            </div>
+            <span class="text-muted small" id="book-reviews-count">(0 reviews)</span>
+            <span class="badge" id="stock-badge">In Stock</span>
+          </div>
+
+          <div class="p-3 bg-white rounded-3 border mb-4 d-flex align-items-baseline gap-3">
+            <span class="h2 fw-bold text-danger mb-0" id="book-selling-price">₹0</span>
+            <span class="text-muted text-decoration-line-through fs-5" id="book-list-price">₹0</span>
+            <span class="badge bg-danger-subtle text-danger" id="book-discount-badge" style="display:none;">Sale</span>
+          </div>
+
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <div class="input-group" style="width: 120px;">
+              <button class="btn btn-outline-secondary btn-sm" type="button" onclick="adjustQty(-1)">-</button>
+              <input type="number" id="qty-input" class="form-control form-control-sm text-center" value="1" min="1" max="10">
+              <button class="btn btn-outline-secondary btn-sm" type="button" onclick="adjustQty(1)">+</button>
+            </div>
+            <button class="btn btn-bv-primary px-4 py-2" id="add-to-cart-btn" onclick="handleAddToCart()">
+              <i class="bi bi-bag-plus me-1"></i> Add to Cart
+            </button>
+            <button class="btn btn-bv-outline px-3 py-2" title="Save to Wishlist" onclick="handleAddToWishlist()">
+              <i class="bi bi-heart me-1"></i> Wishlist
+            </button>
+          </div>
+
+          <h5 class="fw-bold mt-4 mb-2">Description</h5>
+          <p class="text-secondary leading-relaxed" id="book-desc" style="white-space: pre-line;"></p>
+        </div>
+
+        <!-- Metadata sidebar column -->
+        <div class="col-lg-3">
+          <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+            <h6 class="fw-bold border-bottom pb-2 mb-3">Book Specifications</h6>
+            <dl class="row small mb-0">
+              <dt class="col-5 text-muted">Publisher:</dt>
+              <dd class="col-7 text-dark fw-medium" id="meta-publisher">-</dd>
+              <dt class="col-5 text-muted">Published:</dt>
+              <dd class="col-7 text-dark fw-medium" id="meta-published">-</dd>
+              <dt class="col-5 text-muted">Edition:</dt>
+              <dd class="col-7 text-dark fw-medium" id="meta-edition">-</dd>
+              <dt class="col-5 text-muted">Pages:</dt>
+              <dd class="col-7 text-dark fw-medium" id="meta-pages">-</dd>
+              <dt class="col-5 text-muted">Language:</dt>
+              <dd class="col-7 text-dark fw-medium" id="meta-lang">English</dd>
+              <dt class="col-5 text-muted">ISBN-13:</dt>
+              <dd class="col-7 text-dark fw-medium" id="meta-isbn13">-</dd>
+              <dt class="col-5 text-muted">ISBN-10:</dt>
+              <dd class="col-7 text-dark fw-medium" id="meta-isbn10">-</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Reviews Section -->
+      <section class="mt-5 pt-4 border-top">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="fw-bold mb-1">Customer Reviews</h3>
+            <p class="text-muted small mb-0">Feedback and ratings from verified BookVerse readers</p>
+          </div>
+          <button class="btn btn-sm btn-bv-outline" onclick="openReviewModal()">
+            <i class="bi bi-pencil-square me-1"></i> Write a Review
+          </button>
+        </div>
+
+        <div id="reviews-list-container" class="row g-3">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Review Modal -->
+  <div class="modal fade" id="reviewModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Write a Customer Review</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="review-form">
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Rating</label>
+              <select id="review-rating" class="form-select" required>
+                <option value="5">★★★★★ (5 Stars - Outstanding)</option>
+                <option value="4">★★★★☆ (4 Stars - Very Good)</option>
+                <option value="3">★★★☆☆ (3 Stars - Average)</option>
+                <option value="2">★★☆☆☆ (2 Stars - Below Average)</option>
+                <option value="1">★☆☆☆☆ (1 Star - Poor)</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Headline</label>
+              <input type="text" id="review-headline" class="form-control" placeholder="e.g. Must read for software engineers!" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label small fw-semibold">Detailed Comments</label>
+              <textarea id="review-text" class="form-control" rows="4" placeholder="Share your insights on concepts, clarity, and quality..."></textarea>
+            </div>
+            <div class="d-grid mt-4">
+              <button type="submit" class="btn btn-bv-primary">Submit Review</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    let currentBook = null;
+
+    function adjustQty(amount) {
+      const input = document.getElementById('qty-input');
+      let val = parseInt(input.value) || 1;
+      val = Math.max(1, Math.min(10, val + amount));
+      input.value = val;
+    }
+
+    function handleAddToCart() {
+      if (currentBook) {
+        const qty = parseInt(document.getElementById('qty-input').value) || 1;
+        Bookverse.addToCart(currentBook.id, qty);
+      }
+    }
+
+    function handleAddToWishlist() {
+      if (currentBook) {
+        Bookverse.addToWishlist(currentBook.id);
+      }
+    }
+
+    function openReviewModal() {
+      if (!Bookverse.currentUser) {
+        Bookverse.showToast("Please sign in to post a review", "info");
+        setTimeout(() => window.location.href = `/login.html?redirect=${encodeURIComponent(window.location.href)}`, 1000);
+        return;
+      }
+      new bootstrap.Modal(document.getElementById('reviewModal')).show();
+    }
+
+    async function loadBookDetails() {
+      const params = new URLSearchParams(window.location.search);
+      const slug = params.get('slug');
+      const id = params.get('id');
+
+      let url = '';
+      if (slug) url = `/api/books/slug/${encodeURIComponent(slug)}`;
+      else if (id) url = `/api/books/${id}`;
+      else {
+        document.getElementById('details-loading').innerHTML = '<div class="alert alert-danger">No book specified.</div>';
+        return;
+      }
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.success || !data.data) {
+          document.getElementById('details-loading').innerHTML = '<div class="alert alert-warning">Book not found.</div>';
+          return;
+        }
+
+        currentBook = data.data;
+        document.title = `${currentBook.title} — BOOKVERSE`;
+
+        document.getElementById('bc-title').textContent = currentBook.title;
+        document.getElementById('book-title').textContent = currentBook.title;
+        document.getElementById('book-cover').src = currentBook.coverImageUrl || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80';
+        document.getElementById('book-category').textContent = currentBook.categoryName || 'General';
+
+        if (currentBook.authors && currentBook.authors.length > 0) {
+          document.getElementById('book-authors').textContent = 'By ' + currentBook.authors.map(a => a.name).join(', ');
+        } else {
+          document.getElementById('book-authors').textContent = 'Author Unknown';
+        }
+
+        document.getElementById('book-rating').textContent = Number(currentBook.averageRating || 0).toFixed(1);
+        document.getElementById('book-reviews-count').textContent = `(${currentBook.reviewCount || 0} reviews)`;
+
+        const stockBadge = document.getElementById('stock-badge');
+        if (currentBook.stockQuantity > 0) {
+          stockBadge.className = 'badge bg-success-subtle text-success';
+          stockBadge.textContent = `In Stock (${currentBook.stockQuantity})`;
+        } else {
+          stockBadge.className = 'badge bg-danger-subtle text-danger';
+          stockBadge.textContent = 'Out of Stock';
+          document.getElementById('add-to-cart-btn').disabled = true;
+        }
+
+        document.getElementById('book-selling-price').textContent = Bookverse.formatCurrency(currentBook.sellingPrice);
+        if (currentBook.listPrice && currentBook.listPrice > currentBook.sellingPrice) {
+          document.getElementById('book-list-price').textContent = Bookverse.formatCurrency(currentBook.listPrice);
+          document.getElementById('book-discount-badge').style.display = 'inline-block';
+        } else {
+          document.getElementById('book-list-price').style.display = 'none';
+        }
+
+        document.getElementById('book-desc').textContent = currentBook.description || 'No description available for this volume.';
+        document.getElementById('meta-publisher').textContent = currentBook.publisherName || 'Standard Edition';
+        document.getElementById('meta-published').textContent = currentBook.publicationDate || 'Recent';
+        document.getElementById('meta-edition').textContent = currentBook.edition || 'Standard';
+        document.getElementById('meta-pages').textContent = currentBook.pageCount ? `${currentBook.pageCount} pages` : 'N/A';
+        document.getElementById('meta-lang').textContent = currentBook.language || 'English';
+        document.getElementById('meta-isbn13').textContent = currentBook.isbn13 || 'N/A';
+        document.getElementById('meta-isbn10').textContent = currentBook.isbn10 || 'N/A';
+
+        if (currentBook.digitalAvailable) {
+          const div = document.getElementById('digital-read-shortcut');
+          div.style.display = 'block';
+          document.getElementById('digital-read-btn').href = `/read.html?bookId=${currentBook.id}`;
+        }
+
+        document.getElementById('details-loading').style.display = 'none';
+        document.getElementById('details-content').style.display = 'block';
+
+        loadReviews(currentBook.id);
+      } catch (err) {
+        document.getElementById('details-loading').innerHTML = '<div class="alert alert-danger">Error retrieving book info.</div>';
+      }
+    }
+
+    async function loadReviews(bookId) {
+      try {
+        const res = await fetch(`/api/books/${bookId}/reviews`);
+        const data = await res.json();
+        const container = document.getElementById('reviews-list-container');
+
+        if (data.success && data.data && data.data.length > 0) {
+          container.innerHTML = data.data.map(r => `
+            <div class="col-12">
+              <div class="card border-0 shadow-sm rounded-3 p-3 bg-white">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark">★ ${r.rating}</span>
+                    <strong class="text-dark">${r.reviewerName || 'Anonymous Customer'}</strong>
+                    ${r.verifiedPurchase ? '<span class="badge bg-success-subtle text-success small"><i class="bi bi-patch-check-fill me-1"></i>Verified Purchase</span>' : ''}
+                  </div>
+                  <span class="text-muted small">${new Date(r.createdAt).toLocaleDateString()}</span>
+                </div>
+                ${r.headline ? `<h6 class="fw-bold mb-1">${r.headline}</h6>` : ''}
+                <p class="text-secondary small mb-0">${r.reviewText || ''}</p>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          container.innerHTML = '<div class="col-12 empty-state-box">No customer reviews yet. Be the first to share your review!</div>';
+        }
+      } catch (e) {
+        console.error("Failed to fetch reviews", e);
+      }
+    }
+
+    document.getElementById('review-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentBook) return;
+
+      const rating = parseInt(document.getElementById('review-rating').value);
+      const headline = document.getElementById('review-headline').value.trim();
+      const reviewText = document.getElementById('review-text').value.trim();
+
+      try {
+        await Bookverse.apiFetch(`/api/books/${currentBook.id}/reviews`, {
+          method: 'POST',
+          body: { rating, headline, reviewText }
+        });
+
+        Bookverse.showToast("Review submitted successfully!", "success");
+        bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
+        loadBookDetails();
+      } catch (err) {
+        Bookverse.showToast(err.message || "Failed to submit review", "error");
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', loadBookDetails);
+  </script>
+</body>
+</html>

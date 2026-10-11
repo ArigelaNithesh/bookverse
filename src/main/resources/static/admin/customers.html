@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customers — BOOKVERSE Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-light">
+
+  <nav class="navbar navbar-expand-lg bv-navbar sticky-top bg-white border-bottom shadow-sm">
+    <div class="container-fluid px-4">
+      <a class="bv-brand" href="/admin/index.html"><i class="bi bi-book-half fs-3"></i><span>BOOKVERSE <span class="badge bg-danger ms-2 fs-6">ADMIN</span></span></a>
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <a href="/admin/books.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-journal-album me-1"></i>Manage Books</a>
+        <div id="nav-user-slot"></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-4 py-4">
+    <div class="row">
+      <div class="col-lg-2 mb-4">
+        <div class="list-group shadow-sm border-0 rounded-3">
+          <a href="/admin/index.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+          </a>
+          <a href="/admin/books.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-journal-album me-2"></i>Manage Books
+          </a>
+          <a href="/admin/import.html" class="list-group-item list-group-item-action text-primary fw-semibold">
+            <i class="bi bi-cloud-arrow-down me-2"></i>Import Open Library
+          </a>
+          <a href="/admin/orders.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-box-seam me-2"></i>Orders
+          </a>
+          <a href="/admin/customers.html" class="list-group-item list-group-item-action active fw-semibold text-white">
+            <i class="bi bi-people me-2"></i>Customers
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-10">
+        <h3 class="fw-bold mb-1 brand-font">Registered Customers</h3>
+        <p class="text-muted small mb-4">View active accounts and moderate customer platform access.</p>
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light small text-muted">
+                  <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody">
+                  <tr><td colspan="6" class="text-center py-5 text-muted"><div class="spinner-border spinner-border-sm me-2"></div>Loading users...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    async function loadCustomers() {
+      const tbody = document.getElementById('users-tbody');
+      try {
+        const res = await Bookverse.apiFetch('/api/admin/users');
+        if (res.success && res.data) {
+          tbody.innerHTML = res.data.map(u => `
+            <tr>
+              <td><code>#${u.id}</code></td>
+              <td class="fw-semibold">${u.fullName || 'Registered User'}</td>
+              <td>${u.email}</td>
+              <td class="text-muted small">${u.phoneNumber || 'N/A'}</td>
+              <td>
+                <span class="badge ${u.active ? 'bg-success' : 'bg-danger'}">${u.active ? 'Active' : 'Suspended'}</span>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-sm ${u.active ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="toggleUser(${u.id}, ${!u.active})">
+                  ${u.active ? 'Suspend Account' : 'Activate Account'}
+                </button>
+              </td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">${err.message}</td></tr>`;
+      }
+    }
+
+    async function toggleUser(id, newStatus) {
+      try {
+        await Bookverse.apiFetch(`/api/admin/users/${id}/status`, {
+          method: 'PATCH',
+          body: { active: newStatus }
+        });
+        Bookverse.showToast("Customer status updated", "success");
+        loadCustomers();
+      } catch (e) {
+        Bookverse.showToast(e.message || "Failed to update", "error");
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Bookverse.initNavbar();
+      loadCustomers();
+    });
+  </script>
+</body>
+</html>

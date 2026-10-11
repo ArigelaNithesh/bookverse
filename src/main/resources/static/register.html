@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — BOOKVERSE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-light">
+
+  <header class="py-3 bg-white border-bottom shadow-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a class="bv-brand text-decoration-none" href="/index.html">
+        <i class="bi bi-book-half fs-3"></i>
+        <span>BOOKVERSE</span>
+      </a>
+      <a href="/index.html" class="btn btn-sm btn-bv-outline">
+        <i class="bi bi-arrow-left me-1"></i>Back to Home
+      </a>
+    </div>
+  </header>
+
+  <main class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-5">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+          <div class="card-body p-4 p-md-5">
+            <div class="text-center mb-4">
+              <h2 class="fw-bold mb-1">Create an Account</h2>
+              <p class="text-muted small">Join BookVerse to order books and track your reading journey</p>
+            </div>
+
+            <form id="register-form">
+              <div class="mb-3">
+                <label for="fullName" class="form-label small fw-semibold">Full Name</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control" id="fullName" required placeholder="e.g. Rahul Verma">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label small fw-semibold">Email Address</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-envelope"></i></span>
+                  <input type="email" class="form-control" id="email" required placeholder="rahul@example.com">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="phoneNumber" class="form-label small fw-semibold">Phone Number</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-telephone"></i></span>
+                  <input type="tel" class="form-control" id="phoneNumber" placeholder="+91 9876543210">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label small fw-semibold">Password</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                  <input type="password" class="form-control" id="password" required minlength="6" placeholder="At least 6 characters">
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 mt-4">
+                <button type="submit" id="reg-btn" class="btn btn-bv-primary btn-lg">
+                  Create Account
+                </button>
+              </div>
+            </form>
+
+            <div class="text-center mt-4 pt-3 border-top small text-muted">
+              Already have an account? <a href="/login.html" class="text-decoration-none fw-semibold text-primary">Sign in</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      const password = document.getElementById('password').value;
+
+      const btn = document.getElementById('reg-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating account...';
+
+      try {
+        await Bookverse.apiFetch('/api/auth/register', {
+          method: 'POST',
+          body: { fullName, email, phoneNumber, password }
+        });
+
+        Bookverse.showToast("Account created successfully! Please sign in.", "success");
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 1200);
+      } catch (err) {
+        Bookverse.showToast(err.message || "Registration failed", "error");
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+      }
+    });
+  </script>
+</body>
+</html>

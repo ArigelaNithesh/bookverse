@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Catalog — BOOKVERSE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg bv-navbar sticky-top">
+    <div class="container">
+      <a class="bv-brand" href="/index.html">
+        <i class="bi bi-book-half fs-3"></i>
+        <span>BOOKVERSE</span>
+      </a>
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#bvNavbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="bvNavbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+          <li class="nav-item"><a class="nav-link bv-nav-link" href="/index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link bv-nav-link active" href="/books.html">Browse Books</a></li>
+          <li class="nav-item"><a class="nav-link bv-nav-link" href="/categories.html">Categories</a></li>
+          <li class="nav-item"><a class="nav-link bv-nav-link" href="/read.html"><i class="bi bi-journal-richtext text-primary me-1"></i>Digital Reader</a></li>
+          <li class="nav-item"><a class="nav-link bv-nav-link" href="/about.html">About</a></li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-2">
+          <a href="/wishlist.html" class="btn btn-sm btn-bv-outline position-relative px-2 py-1">
+            <i class="bi bi-heart fs-6"></i>
+            <span id="wishlist-counter-badge" class="nav-badge" style="display: none;">0</span>
+          </a>
+          <a href="/cart.html" class="btn btn-sm btn-bv-outline position-relative px-2 py-1">
+            <i class="bi bi-cart3 fs-6"></i>
+            <span id="cart-counter-badge" class="nav-badge" style="display: none;">0</span>
+          </a>
+          <div id="nav-user-slot" class="d-flex align-items-center gap-2"></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CATALOG CONTENT -->
+  <main class="container py-4">
+    <!-- Breadcrumb & Title -->
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="/index.html" class="text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Catalog</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+      <div>
+        <h1 class="h3 fw-bold mb-1">Explore Books</h1>
+        <p class="text-muted small mb-0" id="results-count-text">Showing books from BookVerse collection</p>
+      </div>
+      
+      <!-- Sort selection -->
+      <div class="d-flex align-items-center gap-2">
+        <label for="sort-select" class="small text-muted fw-semibold text-nowrap">Sort By:</label>
+        <select id="sort-select" class="form-select form-select-sm" style="width: 170px;" onchange="loadBooks(0)">
+          <option value="id,desc">Newest First</option>
+          <option value="sellingPrice,asc">Price: Low to High</option>
+          <option value="sellingPrice,desc">Price: High to Low</option>
+          <option value="averageRating,desc">Highest Rated</option>
+          <option value="title,asc">Alphabetical (A-Z)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Filter Sidebar -->
+      <aside class="col-lg-3 mb-4">
+        <div class="card border-0 shadow-sm rounded-3 p-3">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0"><i class="bi bi-funnel me-1"></i>Filters</h6>
+            <button class="btn btn-link btn-sm p-0 text-decoration-none text-muted" onclick="resetFilters()">Reset</button>
+          </div>
+
+          <!-- Keyword search -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Search Catalog</label>
+            <div class="input-group input-group-sm">
+              <input type="text" id="filter-keyword" class="form-control" placeholder="Title, author, ISBN..." onkeyup="if(event.key === 'Enter') loadBooks(0)">
+              <button class="btn btn-bv-primary" onclick="loadBooks(0)"><i class="bi bi-search"></i></button>
+            </div>
+          </div>
+
+          <!-- Category filter -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Category</label>
+            <select id="filter-category" class="form-select form-select-sm" onchange="loadBooks(0)">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+
+          <!-- Digital Format -->
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="filter-digital" onchange="loadBooks(0)">
+              <label class="form-check-label small" for="filter-digital">
+                <i class="bi bi-book text-success me-1"></i>Digital Reading Available
+              </label>
+            </div>
+          </div>
+
+          <!-- Price Range -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Max Price (₹)</label>
+            <input type="range" class="form-range" id="filter-max-price" min="200" max="2500" step="50" value="2500" oninput="document.getElementById('price-val').innerText = '₹' + this.value" onchange="loadBooks(0)">
+            <div class="d-flex justify-content-between small text-muted">
+              <span>₹200</span>
+              <span id="price-val" class="fw-bold text-dark">₹2500</span>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Minimum Rating</label>
+            <select id="filter-rating" class="form-select form-select-sm" onchange="loadBooks(0)">
+              <option value="">All Ratings</option>
+              <option value="4.5">★ 4.5 & above</option>
+              <option value="4.0">★ 4.0 & above</option>
+              <option value="3.0">★ 3.0 & above</option>
+            </select>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Book Grid & Pagination -->
+      <section class="col-lg-9">
+        <div class="row" id="catalog-books-grid">
+          <div class="col-12 loading-spinner-wrapper">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Loading books...</p>
+          </div>
+        </div>
+
+        <!-- Pagination Controls -->
+        <nav class="mt-4" id="pagination-nav" style="display: none;">
+          <ul class="pagination justify-content-center" id="pagination-list"></ul>
+        </nav>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    let currentPage = 0;
+    const pageSize = 12;
+
+    async function loadCategories() {
+      try {
+        const res = await fetch('/api/categories/all');
+        const data = await res.json();
+        if (data.success && data.data) {
+          const select = document.getElementById('filter-category');
+          data.data.forEach(cat => {
+            const opt = document.createElement('option');
+            opt.value = cat.id;
+            opt.textContent = cat.name;
+            select.appendChild(opt);
+          });
+        }
+      } catch (e) {
+        console.error("Failed to load categories", e);
+      }
+    }
+
+    async function loadBooks(page = 0) {
+      currentPage = page;
+      const grid = document.getElementById('catalog-books-grid');
+      grid.innerHTML = `<div class="col-12 loading-spinner-wrapper"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">Loading...</p></div>`;
+
+      const keyword = document.getElementById('filter-keyword').value.trim();
+      const categoryId = document.getElementById('filter-category').value;
+      const digital = document.getElementById('filter-digital').checked;
+      const maxPrice = document.getElementById('filter-max-price').value;
+      const minRating = document.getElementById('filter-rating').value;
+      const sort = document.getElementById('sort-select').value;
+
+      let url = `/api/books?page=${page}&size=${pageSize}&sort=${sort}`;
+      if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+      if (categoryId) url += `&categoryId=${categoryId}`;
+      if (digital) url += `&digitalAvailable=true`;
+      if (maxPrice && maxPrice < 2500) url += `&maxPrice=${maxPrice}`;
+      if (minRating) url += `&minRating=${minRating}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.success && data.data && data.data.content && data.data.content.length > 0) {
+          grid.innerHTML = data.data.content.map(b => Bookverse.renderBookCard(b)).join('');
+          document.getElementById('results-count-text').textContent = `Showing page ${page + 1} of ${data.data.totalPages} (${data.data.totalElements} books found)`;
+          renderPagination(data.data.totalPages, page);
+        } else {
+          grid.innerHTML = `
+            <div class="col-12 empty-state-box">
+              <i class="bi bi-search fs-2 mb-2 d-block text-muted"></i>
+              <h5>No books found matching your criteria</h5>
+              <p class="text-muted small">Try adjusting your keyword, categories, or price filter.</p>
+              <button class="btn btn-sm btn-bv-primary mt-2" onclick="resetFilters()">Reset Filters</button>
+            </div>
+          `;
+          document.getElementById('pagination-nav').style.display = 'none';
+          document.getElementById('results-count-text').textContent = "0 books found";
+        }
+      } catch (err) {
+        grid.innerHTML = `<div class="col-12 text-center text-danger p-4">Error loading books from server.</div>`;
+      }
+    }
+
+    function renderPagination(totalPages, page) {
+      const nav = document.getElementById('pagination-nav');
+      const list = document.getElementById('pagination-list');
+      if (totalPages <= 1) {
+        nav.style.display = 'none';
+        return;
+      }
+      nav.style.display = 'block';
+
+      let html = '';
+      html += `<li class="page-item ${page === 0 ? 'disabled' : ''}"><button class="page-link" onclick="loadBooks(${page - 1})">Previous</button></li>`;
+      for (let i = 0; i < totalPages; i++) {
+        html += `<li class="page-item ${i === page ? 'active' : ''}"><button class="page-link" onclick="loadBooks(${i})">${i + 1}</button></li>`;
+      }
+      html += `<li class="page-item ${page === totalPages - 1 ? 'disabled' : ''}"><button class="page-link" onclick="loadBooks(${page + 1})">Next</button></li>`;
+      list.innerHTML = html;
+    }
+
+    function resetFilters() {
+      document.getElementById('filter-keyword').value = '';
+      document.getElementById('filter-category').value = '';
+      document.getElementById('filter-digital').checked = false;
+      document.getElementById('filter-max-price').value = 2500;
+      document.getElementById('price-val').innerText = '₹2500';
+      document.getElementById('filter-rating').value = '';
+      document.getElementById('sort-select').value = 'id,desc';
+      loadBooks(0);
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadCategories();
+
+      // Check URL parameters for preset category or digital
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('digitalAvailable') === 'true') {
+        document.getElementById('filter-digital').checked = true;
+      }
+      if (params.get('q')) {
+        document.getElementById('filter-keyword').value = params.get('q');
+      }
+
+      loadBooks(0);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — BOOKVERSE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-light">
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg bv-navbar sticky-top bg-white border-bottom shadow-sm">
+    <div class="container-fluid px-4">
+      <a class="bv-brand" href="/index.html"><i class="bi bi-book-half fs-3"></i><span>BOOKVERSE <span class="badge bg-danger ms-2 fs-6">ADMIN</span></span></a>
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <a href="/search.html" class="btn btn-sm btn-outline-primary"><i class="bi bi-globe me-1"></i>Universal Discovery</a>
+        <a href="/books.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-shop me-1"></i>Visit Storefront</a>
+        <div id="nav-user-slot"></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid px-4 py-4">
+    <div class="row">
+      <!-- SIDEBAR -->
+      <div class="col-lg-2 mb-4">
+        <div class="list-group shadow-sm border-0 rounded-3">
+          <a href="/admin/index.html" class="list-group-item list-group-item-action active fw-semibold">
+            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+          </a>
+          <a href="/admin/books.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-journal-album me-2"></i>Manage Books
+          </a>
+          <a href="/admin/import.html" class="list-group-item list-group-item-action text-primary fw-semibold">
+            <i class="bi bi-cloud-arrow-down me-2"></i>Import Open Library
+          </a>
+          <a href="/admin/orders.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-box-seam me-2"></i>Orders
+          </a>
+          <a href="/admin/customers.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-people me-2"></i>Customers
+          </a>
+          <a href="/admin/categories.html" class="list-group-item list-group-item-action">
+            <i class="bi bi-tags me-2"></i>Categories
+          </a>
+        </div>
+
+        <div class="card mt-3 border-0 shadow-sm bg-primary text-white">
+          <div class="card-body">
+            <h6 class="fw-bold"><i class="bi bi-lightning-charge me-1"></i>Quick Importer</h6>
+            <p class="small text-white-50 mb-3">Add any book in the world to your store catalog using Open Library API.</p>
+            <a href="/admin/import.html" class="btn btn-sm btn-light w-100 fw-semibold text-primary">Import Books Now</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h3 class="fw-bold mb-1 brand-font">Store Overview & Operations</h3>
+            <p class="text-muted small mb-0">Real-time inventory metrics, order volume, and catalog sync status.</p>
+          </div>
+          <div class="d-flex gap-2">
+            <a href="/admin/import.html" class="btn btn-bv-primary">
+              <i class="bi bi-plus-circle me-1"></i>Import from Open Library
+            </a>
+            <a href="/admin/books.html" class="btn btn-outline-secondary">
+              <i class="bi bi-list-check me-1"></i>View All Books
+            </a>
+          </div>
+        </div>
+
+        <!-- STAT METRIC CARDS -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6 col-xl-3">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase">Total Catalog Books</div>
+                <h3 class="fw-bold mb-0 mt-1" id="stat-total-books">-</h3>
+              </div>
+              <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                <i class="bi bi-book"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase">Active Customers</div>
+                <h3 class="fw-bold mb-0 mt-1" id="stat-total-users">-</h3>
+              </div>
+              <div class="stat-icon bg-success bg-opacity-10 text-success">
+                <i class="bi bi-people"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase">Total Orders</div>
+                <h3 class="fw-bold mb-0 mt-1" id="stat-total-orders">-</h3>
+              </div>
+              <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                <i class="bi bi-bag-check"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-xl-3">
+            <div class="stat-card d-flex align-items-center justify-content-between">
+              <div>
+                <div class="text-muted small fw-semibold text-uppercase">Total Revenue</div>
+                <h3 class="fw-bold mb-0 mt-1" id="stat-total-revenue">₹0.00</h3>
+              </div>
+              <div class="stat-icon bg-info bg-opacity-10 text-info">
+                <i class="bi bi-currency-rupee"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT IMPORT JOBS & CATALOG ACTIVITY -->
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold mb-0"><i class="bi bi-clock-history me-2 text-primary"></i>Recent Open Library Import Jobs</h6>
+                <a href="/admin/import.html" class="small text-decoration-none">View All Jobs &rarr;</a>
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light small text-muted">
+                      <tr>
+                        <th>Job ID</th>
+                        <th>Query / Genre</th>
+                        <th>Requested</th>
+                        <th>Imported</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recent-imports-tbody">
+                      <tr><td colspan="6" class="text-center py-4 text-muted">Loading import records...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-header bg-white py-3">
+                <h6 class="fw-bold mb-0"><i class="bi bi-shield-check me-2 text-success"></i>System Quick Actions</h6>
+              </div>
+              <div class="card-body">
+                <div class="d-grid gap-2">
+                  <a href="/admin/import.html?q=Franz+Kafka" class="btn btn-outline-primary text-start">
+                    <i class="bi bi-search me-2"></i>Search Kafka's Works
+                  </a>
+                  <a href="/admin/import.html?q=The+Almanack+of+Naval+Ravikant" class="btn btn-outline-primary text-start">
+                    <i class="bi bi-search me-2"></i>Search Naval Ravikant
+                  </a>
+                  <a href="/admin/import.html?q=Meditations" class="btn btn-outline-primary text-start">
+                    <i class="bi bi-search me-2"></i>Search Stoic Philosophy
+                  </a>
+                  <a href="/admin/books.html" class="btn btn-outline-secondary text-start">
+                    <i class="bi bi-sliders me-2"></i>Adjust Prices & Stock
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    async function loadDashboard() {
+      try {
+        const statsRes = await Bookverse.apiFetch('/api/admin/dashboard');
+        if (statsRes.success && statsRes.data) {
+          const s = statsRes.data;
+          document.getElementById('stat-total-books').textContent = s.totalBooks || 0;
+          document.getElementById('stat-total-users').textContent = s.totalUsers || 0;
+          document.getElementById('stat-total-orders').textContent = s.totalOrders || 0;
+          document.getElementById('stat-total-revenue').textContent = Bookverse.formatCurrency(s.totalRevenue || 0);
+        }
+
+        const importsRes = await Bookverse.apiFetch('/api/admin/imports');
+        const tbody = document.getElementById('recent-imports-tbody');
+        if (importsRes.success && importsRes.data && importsRes.data.length > 0) {
+          tbody.innerHTML = importsRes.data.slice(0, 5).map(job => `
+            <tr>
+              <td><code>#${job.id}</code></td>
+              <td class="fw-semibold">${job.searchQuery}</td>
+              <td>${job.requestedCount}</td>
+              <td><span class="badge bg-success-subtle text-success">${job.importedCount}</span></td>
+              <td><span class="badge ${job.status === 'COMPLETED' ? 'bg-success' : 'bg-warning'}">${job.status}</span></td>
+              <td class="small text-muted">${new Date(job.startedAt).toLocaleDateString()}</td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-muted">No import jobs recorded yet. Run your first import!</td></tr>';
+        }
+      } catch (err) {
+        console.error("Dashboard load failed:", err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await Bookverse.initNavbar();
+      loadDashboard();
+    });
+  </script>
+</body>
+</html>
